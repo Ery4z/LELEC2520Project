@@ -5,13 +5,15 @@ import pandapower.plotting as plot
 from pandapower.plotting.plotly import pf_res_plotly
 from pandapower.plotting.plotly import simple_plotly
 import pandapower.control as ct
+import pandapower.toolbox as tb
 net = pp.create_empty_network(f_hz=50, sn_mva=100)
     
 vmin = 0.95
 vmax = 1.1
 load_max = 100.
 
-    
+ratio_gen = 1
+
 # list of Buses
 M1 = pp.create_bus(net, vn_kv=20.0, name="M1", in_service=True, max_vm_pu=vmax, min_vm_pu = vmin, controllable = True, geodata = (1.5,4))
 M2 = pp.create_bus(net, vn_kv=20.0, name="M2", in_service=True, max_vm_pu=vmax, min_vm_pu = vmin, controllable = True, geodata = (3,4))
@@ -68,16 +70,16 @@ LOAD_N204 = pp.create_load(net, bus=N204, p_mw=360.0, q_mvar=180.0, name="N204",
 
 
 # List of Shunts:
-pp.create_shunt(net, bus=N104, q_mvar=-75.0, in_service=True)
+pp.create_shunt(net, bus=N104, q_mvar=-75.0, in_service=False)
 pp.create_shunt(net, bus=N203, q_mvar=-45.0, in_service=True)
 pp.create_shunt(net, bus=N206, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N102, q_mvar=-75.0, in_service=True)
+pp.create_shunt(net, bus=N102, q_mvar=-75.0, in_service=False)
 pp.create_shunt(net, bus=N202, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N105, q_mvar=-75.0, in_service=True)
+pp.create_shunt(net, bus=N105, q_mvar=-75.0, in_service=False)
 pp.create_shunt(net, bus=N205, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N101, q_mvar=-75.0, in_service=True)
+pp.create_shunt(net, bus=N101, q_mvar=-75.0, in_service=False)
 pp.create_shunt(net, bus=N201, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N107, q_mvar=-75.0, in_service=True)
+pp.create_shunt(net, bus=N107, q_mvar=-75.0, in_service=False)
 pp.create_shunt(net, bus=N207, q_mvar=-45.0, in_service=True)
 pp.create_shunt(net, bus=N204, q_mvar=-45.0, in_service=True)
 
@@ -162,3 +164,6 @@ Display the results you need
 Force the reactive power limits 
 
 """
+pp.runpp(net, run_control=True,enforce_q_lims=True)
+print(pp.lf_info(net))
+#pf_res_plotly(net, aspectratio=(1,1));
