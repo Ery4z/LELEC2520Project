@@ -154,3 +154,9 @@ Create the constraints here
 Launch the right routine too
 
 """
+pp.create_poly_cost(net, 0, 'sgen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 0, 'gen', cp1_eur_per_mw=1)
+pp.create_pwl_cost(net, 0, "sgen", [[net.sgen.min_p_mw.at[0], net.sgen.max_p_mw.at[0], 1]])
+pp.create_pwl_cost(net, 0, "gen", [[net.gen.min_p_mw.at[0], net.gen.max_p_mw.at[0], 1]])
+pp.runpp(net, run_control=True)
+pf_res_plotly(net, aspectratio=(1, 1))
