@@ -184,10 +184,10 @@ def G8_cost(x):
 def G_cost_lin(x):
     return 0.25*x
 
-pp.create_poly_cost(net, element=G1, et='gen',cp2_eur_per_mw2=0.001, cp1_eur_per_mw=-0.7, cp0_eur=32.25)
+pp.create_poly_cost(net, element=G4, et='gen',cp2_eur_per_mw2=0.001, cp1_eur_per_mw=-0.7, cp0_eur=32.25)
 pp.create_poly_cost(net, element=G2, et='gen',cp2_eur_per_mw2=4.622e-4, cp1_eur_per_mw=-0.3467, cp0_eur=25)
 pp.create_poly_cost(net, element=G3, et='gen',cp2_eur_per_mw2=5.625e-4, cp1_eur_per_mw=-0.45, cp0_eur=120)
-pp.create_poly_cost(net, element=G4, et='gen',cp2_eur_per_mw2=9.876e-5, cp1_eur_per_mw=-0.089, cp0_eur=60)
+pp.create_poly_cost(net, element=G1, et='gen',cp2_eur_per_mw2=9.876e-5, cp1_eur_per_mw=-0.089, cp0_eur=60)
 
 pp.create_poly_cost(net, element=G5, et="gen", cp1_eur_per_mw=-0.28,cp0_eur=80,cp2_eur_per_mw2=2.8e-4)
 pp.create_poly_cost(net, element=G6, et="gen", cp1_eur_per_mw=-0.3124,cp0_eur=90.0025,cp2_eur_per_mw2=2.81e-4)
@@ -208,6 +208,7 @@ color = ["red","green","blue","yellow","purple","cyan","black","red"]
 
 Total_quadra_pow = 0
 Total_lin_pow = 0
+Total_quadra_cost = 0
 
 x = np.linspace(0,1000,100)
 for gen_number in range(0,8):
@@ -218,6 +219,8 @@ for gen_number in range(0,8):
     plt.ylabel("Cost")
     wp = net.res_gen["p_mw"][gen_number]
     Total_quadra_pow += wp
+    print(Gen_list[gen_number][1](wp))
+    Total_quadra_cost += Gen_list[gen_number][1](wp)
     plt.scatter(wp,Gen_list[gen_number][1](wp),s=150,color="red", marker=".", label="Optimized working point")
     plt.grid()
 
@@ -244,7 +247,7 @@ for gen_number in range(0,8):
     plt.legend()
 
 print(net.res_gen)
-print(f"{Total_quadra_pow=} {Total_lin_pow=}")
+print(f"{Total_quadra_pow=} {Total_quadra_cost=} {Total_lin_pow=}")
 
 
 # Plotting initial working point
