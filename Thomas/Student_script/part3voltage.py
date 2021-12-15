@@ -5,6 +5,8 @@ import pandapower.plotting as plot
 from pandapower.plotting.plotly import pf_res_plotly
 from pandapower.plotting.plotly import simple_plotly
 import pandapower.control as ct
+import matplotlib.pyplot as plt
+import numpy as np
 import pandapower.toolbox as tb
 net = pp.create_empty_network(f_hz=50, sn_mva=100)
     
@@ -70,16 +72,16 @@ LOAD_N204 = pp.create_load(net, bus=N204, p_mw=360.0, q_mvar=180.0, name="N204",
 
 
 # List of Shunts:
-pp.create_shunt(net, bus=N104, q_mvar=-75.0, in_service=False)
+pp.create_shunt(net, bus=N104, q_mvar=-75.0, in_service=True)
 pp.create_shunt(net, bus=N203, q_mvar=-45.0, in_service=True)
 pp.create_shunt(net, bus=N206, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N102, q_mvar=-75.0, in_service=False)
+pp.create_shunt(net, bus=N102, q_mvar=-75.0, in_service=True)
 pp.create_shunt(net, bus=N202, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N105, q_mvar=-75.0, in_service=False)
+pp.create_shunt(net, bus=N105, q_mvar=-75.0, in_service=True)
 pp.create_shunt(net, bus=N205, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N101, q_mvar=-75.0, in_service=False)
+pp.create_shunt(net, bus=N101, q_mvar=-75.0, in_service=True)
 pp.create_shunt(net, bus=N201, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N107, q_mvar=-75.0, in_service=False)
+pp.create_shunt(net, bus=N107, q_mvar=-75.0, in_service=True)
 pp.create_shunt(net, bus=N207, q_mvar=-45.0, in_service=True)
 pp.create_shunt(net, bus=N204, q_mvar=-45.0, in_service=True)
 
@@ -132,7 +134,7 @@ pp.create_transformer_from_parameters(net, hv_bus=N107, lv_bus=N207, sn_mva=500.
 
 # list of Generators:
 G1 = pp.create_gen(net, p_mw=700.0, max_q_mvar=638.58, min_q_mvar=-250.0, sn_mva=1000.0, bus=M1, vm_pu=0.99958, name="M1", slack=False, in_service=True, min_p_mw=0., max_p_mw=850., controllable = True)
-G2 = pp.create_gen(net, p_mw=600.0, max_q_mvar=696.53, min_q_mvar=-250.0, sn_mva=1000.0, bus=M2, vm_pu=0.99958, name="M2", slack=False, in_service=True, min_p_mw=0., max_p_mw=850., controllable = True)
+#G2 = pp.create_gen(net, p_mw=600.0, max_q_mvar=696.53, min_q_mvar=-250.0, sn_mva=1000.0, bus=M2, vm_pu=0.99958, name="M2", slack=False, in_service=True, min_p_mw=0., max_p_mw=850., controllable = True)
 G3=pp.create_gen(net, p_mw=375.0, max_q_mvar=220.83, min_q_mvar=-50.0, sn_mva=450.00, bus=M3, vm_pu=0.99000, name="M3", slack=False, in_service=True, min_p_mw=0., max_p_mw=405., controllable = True)
 G4=pp.create_gen(net, p_mw=250.0, max_q_mvar=143.76, min_q_mvar=-50.0, sn_mva=300.00, bus=M4, vm_pu=0.97580, name="M4", slack=False, in_service=True, min_p_mw=0., max_p_mw=270., controllable = True)
 G5=pp.create_gen(net, p_mw=375.0, max_q_mvar=220.97, min_q_mvar=-50.0, sn_mva=450.00, bus=M5, vm_pu=0.99040, name="M5", slack=False, in_service=True, min_p_mw=0., max_p_mw=405., controllable = True)
@@ -164,6 +166,50 @@ Display the results you need
 Force the reactive power limits 
 
 """
-pp.runpp(net, run_control=True,enforce_q_lims=True)
+
+pp.runpp(net, run_control=True,calculate_voltage_angles = True,enforce_q_lims=True)
+Total_Q = 0
+Total_P = 0
+
+for p in net.res_gen["p_mw"]:
+    Total_P += p
+
+for q in net.res_gen["q_mvar"]:
+    Total_Q += q    
+
+print(f"Total Q = {Total_Q} Total_P={P}")
+
+"""
+X = np.linspace(100,112,20)/100
+Q1 = []
+P1 = []
+P2 = []
+Q2 = []
+for k in X:
+    G2 = pp.create_gen(net, p_mw=600.0, max_q_mvar=696.53, min_q_mvar=-250.0, sn_mva=1000.0, bus=M2, vm_pu=0.99958*k, name="M2", slack=False, in_service=True, min_p_mw=0., max_p_mw=850., controllable = True)
+    pp.runpp(net, run_control=True,calculate_voltage_angles = True,enforce_q_lims=True)
+    Q1.append(net.res_gen["q_mvar"][G1])
+    Q2.append(net.res_gen["q_mvar"][G2])
+    P1.append(net.res_gen["p_mw"][G1])
+    P2.append(net.res_gen["p_mw"][G2])
+    net.gen.drop(G2, inplace=True)
+
+plt.plot(X,Q1,label="Reactive power M1", color="red")
+
+plt.plot(X,Q2,label="Reactive power M2", color = "red",linestyle="--")
+
+plt.plot(X,P1,label="Active power M1", color="blue")
+
+plt.plot(X,P2,label="Active power M2", color = "blue", linestyle="--")
+
+
+plt.legend()
+plt.grid()
+plt.xlabel("M2 Voltage ratio factor")
+plt.ylabel("Power [MVA]")
+plt.show()
+"""
 print(pp.lf_info(net))
+
+
 #pf_res_plotly(net, aspectratio=(1,1));

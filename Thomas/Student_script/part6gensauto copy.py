@@ -259,29 +259,49 @@ color = ["red","green","blue","yellow","purple","cyan","black","red"]
 Total_quadra_pow = 0
 Total_quadra_cost = 0
 
-#x = np.linspace(0,1000,100)
+
+initial_perm = [G1,G2,G3,G4,G5,G6,G7,G8]
+create_polycost_and_calc(initial_perm)
+
+x = np.linspace(0,1000,100)
 for gen_number in range(0,8):
-    #plt.subplot(4,2,gen_number+1)
-    #plt.gca().set_title(f'Generator {gen_number+1}')
-    #plt.plot(x,Gen_list[gen_number][1](x),label=f"Gen{gen_number+1} cost quadratic", color="black")
-    #plt.xlabel("Power [MW]")
-    #plt.ylabel("Cost")
+    plt.subplot(4,2,gen_number+1)
+    plt.gca().set_title(f'Generator {gen_number+1}')
+    plt.plot(x,Gen_list[gen_number][1](x),label=f"Gen{gen_number+1} cost quadratic initial", color="black")
+    plt.xlabel("Power [MW]")
+    plt.ylabel("Cost")
     wp = net.res_gen["p_mw"][gen_number]
     Total_quadra_pow += wp
-    Total_quadra_pow += Gen_list[gen_number][1](wp)
-    #plt.scatter(wp,Gen_list[gen_number][1](wp),s=150,color="red", marker=".", label="Optimized working point")
+    Total_quadra_cost += Gen_list[gen_number][1](wp)
+    plt.scatter(wp,Gen_list[gen_number][1](wp),s=150,color="black", marker=".", label="Optimized working point")
+    plt.grid()
+
+print(f"{Total_quadra_pow} {Total_quadra_cost}")
+Total_quadra_pow = 0
+Total_quadra_cost = 0
+# better_perm = [G5,G3,G8,G6,G1,G2,G4,G7]
+random_perm = [G5, G4, G3, G2, G6, G7, G8, G1]
+#random.shuffle(random_perm)
+create_polycost_and_calc(random_perm)
+print(random_perm)
+for cost_funct_number in range(0,8):
+    gen = random_perm[cost_funct_number]
+    gen_number  =int(str(gen))
+    plt.subplot(4,2,gen_number+1)
+    plt.plot(x,Gen_list[cost_funct_number][1](x),label=f"Gen{gen_number+1} cost quadratic random", color="red")
+
+    wp = net.res_gen["p_mw"][gen_number]
+    Total_quadra_pow += wp
+    Total_quadra_cost += Gen_list[gen_number][1](wp)
+    plt.scatter(wp,Gen_list[cost_funct_number][1](wp),s=150,color="red", marker=".", label="Optimized working point")
     #plt.grid()
+    plt.legend()
 
-initial_cost = Total_quadra_cost
-min_cost = 99999
-min_list = []
-for k in range(5):
-    n_l, n_c = find_better_cost()
-    if min_cost > n_c:
-        min_list = n_l
-        min_cost = n_c
+print(f"{Total_quadra_pow} {Total_quadra_cost}")
 
-print(f"\tBEST cost found {min_cost} with {min_list}")
+pf_res_plotly(net, aspectratio=(1, 1))
+
+plt.show()
     
 '''
 
