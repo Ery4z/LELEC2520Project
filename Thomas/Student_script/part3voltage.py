@@ -72,16 +72,16 @@ LOAD_N204 = pp.create_load(net, bus=N204, p_mw=360.0, q_mvar=180.0, name="N204",
 
 
 # List of Shunts:
-pp.create_shunt(net, bus=N104, q_mvar=-75.0, in_service=True)
+pp.create_shunt(net, bus=N104, q_mvar=-75.0, in_service=False)
 pp.create_shunt(net, bus=N203, q_mvar=-45.0, in_service=True)
 pp.create_shunt(net, bus=N206, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N102, q_mvar=-75.0, in_service=True)
+pp.create_shunt(net, bus=N102, q_mvar=-75.0, in_service=False)
 pp.create_shunt(net, bus=N202, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N105, q_mvar=-75.0, in_service=True)
+pp.create_shunt(net, bus=N105, q_mvar=-75.0, in_service=False)
 pp.create_shunt(net, bus=N205, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N101, q_mvar=-75.0, in_service=True)
+pp.create_shunt(net, bus=N101, q_mvar=-75.0, in_service=False)
 pp.create_shunt(net, bus=N201, q_mvar=-45.0, in_service=True)
-pp.create_shunt(net, bus=N107, q_mvar=-75.0, in_service=True)
+pp.create_shunt(net, bus=N107, q_mvar=-75.0, in_service=False)
 pp.create_shunt(net, bus=N207, q_mvar=-45.0, in_service=True)
 pp.create_shunt(net, bus=N204, q_mvar=-45.0, in_service=True)
 
@@ -134,7 +134,7 @@ pp.create_transformer_from_parameters(net, hv_bus=N107, lv_bus=N207, sn_mva=500.
 
 # list of Generators:
 G1 = pp.create_gen(net, p_mw=700.0, max_q_mvar=638.58, min_q_mvar=-250.0, sn_mva=1000.0, bus=M1, vm_pu=0.99958, name="M1", slack=False, in_service=True, min_p_mw=0., max_p_mw=850., controllable = True)
-#G2 = pp.create_gen(net, p_mw=600.0, max_q_mvar=696.53, min_q_mvar=-250.0, sn_mva=1000.0, bus=M2, vm_pu=0.99958, name="M2", slack=False, in_service=True, min_p_mw=0., max_p_mw=850., controllable = True)
+G2 = pp.create_gen(net, p_mw=600.0, max_q_mvar=696.53, min_q_mvar=-250.0, sn_mva=1000.0, bus=M2, vm_pu=0.99958, name="M2", slack=False, in_service=True, min_p_mw=0., max_p_mw=850., controllable = True)
 G3=pp.create_gen(net, p_mw=375.0, max_q_mvar=220.83, min_q_mvar=-50.0, sn_mva=450.00, bus=M3, vm_pu=0.99000, name="M3", slack=False, in_service=True, min_p_mw=0., max_p_mw=405., controllable = True)
 G4=pp.create_gen(net, p_mw=250.0, max_q_mvar=143.76, min_q_mvar=-50.0, sn_mva=300.00, bus=M4, vm_pu=0.97580, name="M4", slack=False, in_service=True, min_p_mw=0., max_p_mw=270., controllable = True)
 G5=pp.create_gen(net, p_mw=375.0, max_q_mvar=220.97, min_q_mvar=-50.0, sn_mva=450.00, bus=M5, vm_pu=0.99040, name="M5", slack=False, in_service=True, min_p_mw=0., max_p_mw=405., controllable = True)
@@ -177,7 +177,7 @@ for p in net.res_gen["p_mw"]:
 for q in net.res_gen["q_mvar"]:
     Total_Q += q    
 
-print(f"Total Q = {Total_Q} Total_P={P}")
+print(f"Total Q = {Total_Q} Total_P={Total_P}")
 
 """
 X = np.linspace(100,112,20)/100
