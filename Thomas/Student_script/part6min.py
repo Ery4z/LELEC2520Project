@@ -62,7 +62,7 @@ LOAD_N202 = pp.create_load(net, bus=N202, p_mw=360.0, q_mvar=180.0, name="N202",
 LOAD_N205 = pp.create_load(net, bus=N205, p_mw=360.0, q_mvar=180.0, name="N205", in_service=True, max_p_mw=360., min_p_mw=360., max_q_mvar=180., min_q_mvar=180., controllable = True)
 LOAD_N201 = pp.create_load(net, bus=N201, p_mw=360.0, q_mvar=180.0, name="N201", in_service=True, max_p_mw=360., min_p_mw=360., max_q_mvar=180., min_q_mvar=180., controllable = True)
 LOAD_N207 = pp.create_load(net, bus=N207, p_mw=360.0, q_mvar=180.0, name="N207", in_service=True, max_p_mw=360., min_p_mw=360., max_q_mvar=180., min_q_mvar=180., controllable = True)
-LOAD_N204 = pp.create_load(net, bus=N204, p_mw=360.0, q_mvar=180.0, name="N204", in_service=True, max_p_mw=360., min_p_mw=360., max_q_mvar=180., min_q_mvar=180., controllable = True)
+LOAD_N204 = pp.create_load(net, bus=N204, p_mw=360.0, q_mvar=180.0, name="N204", in_service=True, max_p_mw=360.*1.5, min_p_mw=360., max_q_mvar=180., min_q_mvar=180., controllable = True)
 
 
 
@@ -154,3 +154,19 @@ Create the constraints here
 Launch the right routine too
 
 """
+
+
+pp.create_poly_cost(net, 0, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 1, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 2, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 3, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 4, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 5, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 6, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 7, 'gen', cp1_eur_per_mw=1)
+
+pp.create_poly_cost(net, element=LOAD_N204, et='load', cp1_eur_per_mw=-2)
+
+
+pp.runopp(net,verbrose=True)
+pf_res_plotly(net, aspectratio=(1, 1))

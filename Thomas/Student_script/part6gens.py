@@ -5,6 +5,8 @@ import pandapower.plotting as plot
 from pandapower.plotting.plotly import pf_res_plotly
 from pandapower.plotting.plotly import simple_plotly
 import pandapower.control as ct
+import numpy as np
+import matplotlib.pyplot as plt
 net = pp.create_empty_network(f_hz=50, sn_mva=100)
     
 vmin = 0.9
@@ -154,3 +156,108 @@ Create the constraints here
 Launch the right routine too
 
 """
+
+def G1_cost(x):
+    return 0.001 * x**2 -0.7 * x + 32.25
+
+def G2_cost(x):
+    return 4.622e-4 * x**2 -0.3467 * x + 25
+
+def G3_cost(x):
+    return 5.625e-4 * x**2 -0.45 * x + 120
+
+def G4_cost(x):
+    return 9.876e-5 * x**2 -0.089 * x + 60
+
+def G5_cost(x):
+    return 2.8e-4 * x**2 -0.28 * x + 80
+
+def G6_cost(x):
+    return 2.81e-4 * x**2 -0.3124 * x + 90.0025
+
+def G7_cost(x):
+    return 3.024e-5 * x**2 -0.034776 * x + 25
+
+def G8_cost(x):
+    return 5.555e-4 * x**2 -0.6666 * x + 235
+
+def G_cost_lin(x):
+    return 0.25*x
+
+pp.create_poly_cost(net, element=G4, et='gen',cp2_eur_per_mw2=0.001, cp1_eur_per_mw=-0.7, cp0_eur=32.25)
+pp.create_poly_cost(net, element=G2, et='gen',cp2_eur_per_mw2=4.622e-4, cp1_eur_per_mw=-0.3467, cp0_eur=25)
+pp.create_poly_cost(net, element=G3, et='gen',cp2_eur_per_mw2=5.625e-4, cp1_eur_per_mw=-0.45, cp0_eur=120)
+pp.create_poly_cost(net, element=G1, et='gen',cp2_eur_per_mw2=9.876e-5, cp1_eur_per_mw=-0.089, cp0_eur=60)
+
+pp.create_poly_cost(net, element=G5, et="gen", cp1_eur_per_mw=-0.28,cp0_eur=80,cp2_eur_per_mw2=2.8e-4)
+pp.create_poly_cost(net, element=G6, et="gen", cp1_eur_per_mw=-0.3124,cp0_eur=90.0025,cp2_eur_per_mw2=2.81e-4)
+pp.create_poly_cost(net, element=G7, et="gen", cp1_eur_per_mw=-0.034776,cp0_eur=24.9981,cp2_eur_per_mw2=3.024e-5)
+pp.create_poly_cost(net, element=G8, et="gen", cp1_eur_per_mw=-0.6666,cp0_eur=234.98,cp2_eur_per_mw2=5.555e-4)
+
+Gen_list = [[G1,G1_cost], [G2,G2_cost], [G3,G3_cost], [G4,G4_cost], [G5,G5_cost], [G6,G6_cost], [G7,G7_cost], [G8,G8_cost]]
+
+
+net_unop = net
+
+
+pp.runopp(net)
+
+
+pf_res_plotly(net, aspectratio=(1, 1))
+color = ["red","green","blue","yellow","purple","cyan","black","red"]
+
+Total_quadra_pow = 0
+Total_lin_pow = 0
+Total_quadra_cost = 0
+
+x = np.linspace(0,1000,100)
+for gen_number in range(0,8):
+    plt.subplot(4,2,gen_number+1)
+    plt.gca().set_title(f'Generator {gen_number+1}')
+    plt.plot(x,Gen_list[gen_number][1](x),label=f"Gen{gen_number+1} cost quadratic", color="black")
+    plt.xlabel("Power [MW]")
+    plt.ylabel("Cost")
+    wp = net.res_gen["p_mw"][gen_number]
+    Total_quadra_pow += wp
+    print(Gen_list[gen_number][1](wp))
+    Total_quadra_cost += Gen_list[gen_number][1](wp)
+    plt.scatter(wp,Gen_list[gen_number][1](wp),s=150,color="red", marker=".", label="Optimized working point")
+    plt.grid()
+
+
+# Lin cost calculations
+pp.create_poly_cost(net, 0, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 1, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 2, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 3, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 4, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 5, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 6, 'gen', cp1_eur_per_mw=1)
+pp.create_poly_cost(net, 7, 'gen', cp1_eur_per_mw=1)
+
+pp.runopp(net)
+
+for gen_number in range(0,8):
+    plt.subplot(4,2,gen_number+1)
+    plt.gca().set_title(f'Generator {gen_number+1}')
+    plt.plot(x,G_cost_lin(x),label=f"Gen{gen_number+1} cost linear", color="blue")
+    wp = net.res_gen["p_mw"][gen_number]
+    Total_lin_pow += wp
+    plt.scatter(wp,G_cost_lin(wp),s=150,color="blue", marker=".", label="Optimized working point")
+    plt.legend()
+
+print(net.res_gen)
+print(f"{Total_quadra_pow=} {Total_quadra_cost=} {Total_lin_pow=}")
+
+
+# Plotting initial working point
+'''pp.runpp(net_unop)
+x = np.linspace(0,1000,100)
+for gen_number in range(0,8):
+    plt.subplot(4,2,gen_number+1)
+    uo_wp = net_unop.res_gen["p_mw"][gen_number]
+    plt.scatter(uo_wp,Gen_list[gen_number][1](uo_wp),s=150,color="black", marker=".", label="Initial working point")
+    plt.legend()'''
+
+
+plt.show()
