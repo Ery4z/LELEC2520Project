@@ -149,8 +149,9 @@ ct.controller.trafo.DiscreteTapControl.DiscreteTapControl(net,18, 1.01,1.021, or
 
 ##Devo analizzare 25 e 29
 
-pp.runpp(net, run_control=True)
-print(net.res_trafo.loc[2].to_csv('Part1/Q1_5 - Trafo N7 - N105'))
+pp.runpp(net, run_control=True,trafo_model='t')
+print(net.res_trafo.loc[2])
+#.to_csv('Part1/Q1_5 - Trafo N7 - N105')
 #print(net.res_bus) 
 #print(net.res_line.to_csv("resline.csv"))
 #pf_res_plotly(net, aspectratio=(1,1));
